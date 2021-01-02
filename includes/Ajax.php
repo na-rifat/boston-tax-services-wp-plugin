@@ -14,17 +14,7 @@ class Ajax {
         boston_ajax( 'boston_options', [$this, 'save_options'] );
         boston_ajax( 'save_dashboard_shortcodes', [$this, 'save_dashboard_shortcodes'] );
         boston_ajax( 'user_agreement_accept', [$this, 'user_agreement_accept'] );
-        boston_ajax( 'get_messages', [$this, 'get_messages'] );
         add_action( 'init', [$this, 'init'] );
-    }
-
-    /**
-     * Returns messages
-     *
-     * @return void
-     */
-    public function get_messages() {
-        
     }
 
     /**
@@ -126,22 +116,26 @@ class Ajax {
         }
 
         $shortcodes = [
-            'current_year_taxes'   => boston_var( 'current_year_taxes' ),
-            'prior_year_taxes'     => boston_var( 'prior_year_taxes' ),
-            'boston_user_messages' => boston_var( 'boston_user_messages' ),
-            'irs_correspondence'   => boston_var( 'irs_correspondence' ),
-            'boston_user_settings' => boston_var( 'boston_user_settings' ),
-            'boston_welcome_page'  => boston_var( 'boston_welcome_page' ),
-            'user_wizard_step_1'   => boston_var( 'user_wizard_step_1' ),
-            'user_wizard_step_2'   => boston_var( 'user_wizard_step_2' ),
-            'user_wizard_step_3'   => boston_var( 'user_wizard_step_3' ),
-            'user_wizard_step_4'   => boston_var( 'user_wizard_step_4' ),
-            'user_wizard_step_5'   => boston_var( 'user_wizard_step_5' ),
-            'wizard_page_slug'     => boston_var( 'wizard_page_slug' ),
-            'dashboard_page_slug'  => boston_var( 'dashboard_page_slug' ),
-            'wizard_form_id_1'     => boston_var( 'wizard_form_id_1' ),
-            'wizard_form_id_2'     => boston_var( 'wizard_form_id_2' ),
-            'wizard_form_id_3'     => boston_var( 'wizard_form_id_3' ),
+            'current_year_taxes'               => boston_var( 'current_year_taxes' ),
+            'prior_year_taxes'                 => boston_var( 'prior_year_taxes' ),
+            'boston_user_messages'             => boston_var( 'boston_user_messages' ),
+            'irs_correspondence'               => boston_var( 'irs_correspondence' ),
+            'boston_user_settings'             => boston_var( 'boston_user_settings' ),
+            'boston_welcome_page'              => boston_var( 'boston_welcome_page' ),
+            'user_wizard_step_1'               => boston_var( 'user_wizard_step_1' ),
+            'user_wizard_step_2'               => boston_var( 'user_wizard_step_2' ),
+            'user_wizard_step_3'               => boston_var( 'user_wizard_step_3' ),
+            'user_wizard_step_4'               => boston_var( 'user_wizard_step_4' ),
+            'user_wizard_step_5'               => boston_var( 'user_wizard_step_5' ),
+            'wizard_page_slug'                 => boston_var( 'wizard_page_slug' ),
+            'dashboard_page_slug'              => boston_var( 'dashboard_page_slug' ),
+            'wizard_form_id_1'                 => boston_var( 'wizard_form_id_1' ),
+            'wizard_form_id_2'                 => boston_var( 'wizard_form_id_2' ),
+            'wizard_form_id_3'                 => boston_var( 'wizard_form_id_3' ),
+            'restricted_plages_for_all'        => boston_var( 'restricted_plages_for_all' ),
+            'restricted_plages_for_logged_out' => boston_var( 'restricted_plages_for_logged_out' ),
+            'tax_expert_dashboard_page_slug'   => boston_var( 'tax_expert_dashboard_page_slug' ),
+            'client_dashboard_page_slug'       => boston_var( 'client_dashboard_page_slug' ),
         ];
 
         foreach ( $shortcodes as $key => $value ) {

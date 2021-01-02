@@ -35,6 +35,43 @@ class User {
 
         $this->info_list = $this->profile_info();
         $this->collect_forms_list();
+
+        add_action( 'template_redirect', [$this, 'check_for_redirection'] );
+    }
+
+    /**
+     * Checks for redirection via filtering
+     *
+     * @return void
+     */
+    public function check_for_redirection() {
+
+        if(is_admin())return;
+
+        $dashboard_slug                  = get_option( 'dashboard_page_slug' );
+        $client_dashboard_slug           = get_option( 'client_dashboard_page_slug' );
+        $tax_expert_dashboard_slug       = get_option( 'tax_expert_dashboard_page_slug' );
+        $restricted_pages_for_all        = explode( ', ', get_option( 'restricted_plages_for_all' ) );
+        $restricted_pages_for_logged_out = explode( ', ', get_option( 'restricted_plages_for_logged_out' ) );
+
+        ! empty( $client_dashboard_slug ) && ! empty( $tax_expert_dashboard_slug ) ? 
+        array_push( $restricted_pages_for_all, $client_dashboard_slug, $tax_expert_dashboard_slug ) : '';
+
+        if ( is_page( $restricted_pages_for_all ) ) {
+            if ( is_user_logged_in() ) {
+                wp_redirect( site_url( "/{$dashboard_slug}" ), 301 );
+                return;
+            } else {
+                wp_redirect( site_url(), 301 );
+                return;
+            }
+        }
+
+        if ( is_page( $restricted_pages_for_logged_out ) && ! is_user_logged_in() ) {
+            wp_redirect( site_url(), 301 );
+            return;
+        }
+
     }
 
     /**

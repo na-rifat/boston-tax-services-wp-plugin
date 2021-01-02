@@ -92,6 +92,9 @@
                     >
                 </td>
             </tr>
+
+            <!-- Wizard settings part -->
+
             <tr><th><h2><?php _e( 'Wizard settings', 'boston-tax' )?></h2></th><td></td></tr>
             <tr>
                 <th><label for="user_wizard_step_1">Step 1(First form)</label></th>
@@ -163,32 +166,9 @@
                     >
                 </td>
             </tr>
-            <tr>
-                <th><label for="wizard_page_slug">Wizard page slug</label></th>
-                <td>
-                    <input
-                        type="text"
-                        placeholder="slug-slug"
-                        name="wizard_page_slug"
-                        id="wizard_page_slug"
-                        value="<?php echo boston_get_option( 'wizard_page_slug' ) ?>"
-                        class="regular-text"
-                    >
-                </td>
-            </tr>
-            <tr>
-                <th><label for="dashboard_page_slug">Dashboard page slug</label></th>
-                <td>
-                    <input
-                        type="text"
-                        placeholder="slug-slug"
-                        name="dashboard_page_slug"
-                        id="dashboard_page_slug"
-                        value="<?php echo boston_get_option( 'dashboard_page_slug' ) ?>"
-                        class="regular-text"
-                    >
-                </td>
-            </tr>
+
+            <!-- Wizard forms information part -->
+
             <tr><th><h2><?php _e( 'Wizard forms information', 'boston-tax' )?></h2></th><td></td></tr>
             <tr>
                 <th><label for="wizard_form_id_1">Wizard form ID(1)</label></th>
@@ -229,6 +209,93 @@
                     >
                 </td>
             </tr>
+
+
+            <!-- Pages settings part -->
+
+            <tr><th><h2><?php _e( 'Pages settings', 'boston-tax' )?></h2></th><td></td></tr>
+            <tr>
+                <th><label for="wizard_page_slug">Wizard page slug</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug"
+                        name="wizard_page_slug"
+                        id="wizard_page_slug"
+                        value="<?php echo boston_get_option( 'wizard_page_slug' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label for="dashboard_page_slug">Dashboard page slug</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug"
+                        name="dashboard_page_slug"
+                        id="dashboard_page_slug"
+                        value="<?php echo boston_get_option( 'dashboard_page_slug' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label for="client_dashboard_page_slug">Client dashboard page slug</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug"
+                        name="client_dashboard_page_slug"
+                        id="client_dashboard_page_slug"
+                        value="<?php echo boston_get_option( 'client_dashboard_page_slug' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <th><label for="tax_expert_dashboard_page_slug">Tax expert dashboard page slug</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug"
+                        name="tax_expert_dashboard_page_slug"
+                        id="tax_expert_dashboard_page_slug"
+                        value="<?php echo boston_get_option( 'tax_expert_dashboard_page_slug' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+
+            <tr>
+                <th><label for="restricted_plages_for_all">Restricted pages for all</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug, slug-slug, id"
+                        name="restricted_plages_for_all"
+                        id="restricted_plages_for_all"
+                        value="<?php echo boston_get_option( 'restricted_plages_for_all' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+
+            <tr>
+                <th><label for="restricted_plages_for_logged_out">Restricted pages for logged out users</label></th>
+                <td>
+                    <input
+                        type="text"
+                        placeholder="slug-slug, slug-slug, id"
+                        name="restricted_plages_for_logged_out"
+                        id="restricted_plages_for_logged_out"
+                        value="<?php echo boston_get_option( 'restricted_plages_for_logged_out' ) ?>"
+                        class="regular-text"
+                    >
+                </td>
+            </tr>
+
+            <!-- submit part -->
             <tr>
                 <th class="boston-save-load"></th>
                 <td>

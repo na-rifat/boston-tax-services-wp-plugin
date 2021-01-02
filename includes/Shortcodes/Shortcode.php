@@ -11,9 +11,12 @@ class Shortcode {
     public $is5 = false;
     public $wizard;
     public $user;
-    public function __construct( $wizard, $user ) {
-        $this->wizard = $wizard;
-        $this->user   = $user;
+    public $messages;
+
+    public function __construct( $wizard, $user, $messages ) {
+        $this->wizard   = $wizard;
+        $this->user     = $user;
+        $this->messages = $messages;
         add_shortcode( 'user-dashboard-menu', [$this, 'user_dashboard_menu'] );
         add_shortcode( 'boston-user-dashboard', [$this, 'boston_user_dashboard'] );
         add_shortcode( 'boston-echo', [$this, 'boston_echo'] );
@@ -24,18 +27,7 @@ class Shortcode {
         add_shortcode( 'boston-docusign-wizard', [$this, 'docusign_wizard'] );
         add_shortcode( 'dashboard-user-profile', [$this->user, 'profile'] );
         add_shortcode( 'copy-of-questionnaire', [$this->user, 'copy_of_questionnaire'] );
-        add_shortcode( 'boston-messages', [$this, 'messages'] );
-    }
-
-    /**
-     * Returns the messages template
-     *
-     * @return void
-     */
-    public function messages() {
-        ob_start();
-        include __DIR__ . "/views/messages.php";
-        return ob_get_clean();
+        add_shortcode( 'boston-messages', [$this->messages, 'messages'] );
     }
 
     /**

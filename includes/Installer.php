@@ -6,6 +6,14 @@ namespace Boston;
  * Installer handler class
  */
 class Installer {
+    public $db;
+    public $charset_collate;
+    public $prefix;
+
+    public function __construct() {
+
+    }
+
     /**
      * Run the installer
      *
@@ -15,6 +23,16 @@ class Installer {
         $this->add_version();
         $this->create_tables();
     }
+
+    public function init() {
+        global $wpdb;
+        $this->db              = $wpdb;
+        $this->prefix          = $wpdb->prefix;
+        $this->charset_collate = $wpdb->get_charset_collate();
+
+        $this->run();
+    }
+
     /**
      * Stores the current version
      *
@@ -33,12 +51,41 @@ class Installer {
      * @return void
      */
     public function create_tables() {
-        global $wpdb;
-        $charset_collate = $wpdb->get_charset_collate();
-        $prefix = $wpdb->prefix;
+        $this->create_files_record_table();
+        $this->create_messages_table();
+    }
 
+    /**
+     * Creates a table in DB for store messages
+     *
+     * @return void
+     */
+    public function create_messages_table() {
+        $schema = "CREATE TABLE IF NOT EXISTS `{$this->prefix}boston_messages` (
+            `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+            `to_user_id` bigint NOT NULL,
+            `from_user_id` bigint NOT NULL,
+            `message_content` longtext NOT NULL,
+            `read_at` longtext NOT NULL,
+            `date` longtext NOT NULL,
+            `status` varchar(500) NOT NULL,
+            PRIMARY KEY (`id`)
+           ) $this->charset_collate";
 
-        $schema = "CREATE TABLE IF NOT EXISTS `{$prefix}boston_user_file_records` (
+        if ( ! function_exists( 'dbDelta' ) ) {
+            require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+        }
+
+        dbDelta( $schema );
+    }
+
+    /**
+     * Creates a table in DB for file records
+     *
+     * @return void
+     */
+    public function create_files_record_table() {
+        $schema = "CREATE TABLE IF NOT EXISTS `{$this->prefix}boston_user_file_records` (
             `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
             `real_name` varchar(400) NOT NULL,
             `type` varchar(200) NOT NULL,
@@ -54,10 +101,9 @@ class Installer {
             `status` varchar(100) NOT NULL,
             `date` varchar(1000) NOT NULL,
             PRIMARY KEY (`id`)
-           ) $charset_collate";
+           ) $this->charset_collate";
 
-
-        if ( !function_exists( 'dbDelta' ) ) {
+        if ( ! function_exists( 'dbDelta' ) ) {
             require_once ABSPATH . '/wp-admin/includes/upgrade.php';
         }
 

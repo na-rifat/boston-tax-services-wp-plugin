@@ -41,7 +41,7 @@ class BostonTax {
      */
     public function activate() {
         $installer = new Installer();
-        $installer->run();
+        $installer->init();
 
     }
 
@@ -65,17 +65,18 @@ class BostonTax {
      */
     public function initialize() {
         new Assets();
-        $wizard = new Wizard\Wizard();
-        $user   = new User\User();
+        $wizard   = new Wizard\Wizard();
+        $user     = new User\User();
+        $messages = new Messages\Messages();
 
-        new Shortcode( $wizard, $user );
+        new Shortcode( $wizard, $user, $messages );
         new File\File();
 
         if ( ! is_admin() ) {
 
             new Frontend\Frontend();
             if ( ! is_user_logged_in() ) {
-                 new Sociallogin();
+                new Sociallogin();
             }
         } else {
             new Admin\Admin();

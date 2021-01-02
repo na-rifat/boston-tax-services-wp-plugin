@@ -12,6 +12,8 @@ class Assets {
     function __construct() {
         add_action( 'wp_enqueue_scripts', [$this, 'register'] );
         add_action( 'admin_enqueue_scripts', [$this, 'register'] );
+        add_action( 'wp_enqueue_scripts', [$this, 'load'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'load'] );
     }
 
     /**
@@ -21,19 +23,33 @@ class Assets {
      */
     public function get_scripts() {
         return [
-            'boston-frontend-script' => [
+            'boston-frontend-script'  => [
                 'src'     => jsfile( 'frontend.js' ),
                 'version' => jsversion( 'frontend.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-admin-script'    => [
+            'boston-admin-script'     => [
                 'src'     => jsfile( 'admin.js' ),
                 'version' => jsversion( 'admin.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-file-script'     => [
+            'boston-file-script'      => [
                 'src'     => jsfile( 'file.js' ),
                 'version' => jsversion( 'file.js' ),
+                'deps'    => ['jquery'],
+            ],
+            'boston-messages-script'  => [
+                'src'     => jsfile( 'messages.js' ),
+                'version' => jsversion( 'messages.js' ),
+                'deps'    => ['jquery'],
+            ],
+            'boston-bootstrap-script' => [
+                'src'     => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
+                'version' => '3.3.5',
+            ],
+            'rich-text-editor-script' => [
+                'src'     => jsfile( 'rich_text.js' ),
+                'version' => jsversion( 'rich_text.js' ),
                 'deps'    => ['jquery'],
             ],
         ];
@@ -46,17 +62,29 @@ class Assets {
      */
     public function get_styles() {
         return [
-            'boston-frontend-style' => [
+            'boston-frontend-style'    => [
                 'src'     => cssfile( 'frontend.css' ),
                 'version' => cssversion( 'frontend.css' ),
             ],
-            'boston-admin-style'    => [
+            'boston-admin-style'       => [
                 'src'     => cssfile( 'admin.css' ),
                 'version' => cssversion( 'admin.css' ),
             ],
-            'boston-custom-style'   => [
+            'boston-custom-style'      => [
                 'src'     => cssfile( 'custom.css' ),
                 'version' => cssversion( 'custom.css' ),
+            ],
+            'boston-bootstrap-style'   => [
+                'src'     => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
+                'version' => '3.3.5',
+            ],
+            'boston-fontawesome-style' => [
+                'src'     => 'https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css',
+                'version' => '4.4.0',
+            ],
+            'boston-rich-text-style'   => [
+                'src'     => cssfile( 'rich_text.css' ),
+                'version' => cssversion( 'rich_text.css' ),
             ],
         ];
     }
@@ -90,8 +118,12 @@ class Assets {
                 'wizard_form_id_2' => get_option( 'wizard_form_id_2' ),
                 'wizard_form_id_3' => get_option( 'wizard_form_id_3' ),
                 'wizard_page'      => get_option( 'wizard_page_slug' ),
-                'current_page'     => $post->name,
-                'messages_nonce'   => wp_create_nonce( 'get_messages' ),
+                'current_page'     => basename( get_permalink(), '.php' ),
+            ],
+            'boston-messages-script' => [
+                'ajaxurl'        => admin_url( 'admin-ajax.php' ),
+                'current_page'   => basename( get_permalink(), '.php' ),
+                'messages_nonce' => wp_create_nonce( 'get_messages' ),
             ],
         ];
     }
@@ -107,7 +139,7 @@ class Assets {
         foreach ( $scripts as $handle => $script ) {
             $deps = isset( $script['deps'] ) ? $script['deps'] : false;
 
-            wp_register_script( $handle, $script['src'], $deps, true );
+            wp_register_script( $handle, $script['src'], $deps, ! empty( $script['version'] ) ? $script['version'] : false, true );
 
         }
 
@@ -116,7 +148,7 @@ class Assets {
         foreach ( $styles as $handle => $style ) {
             $deps = isset( $style['deps'] ) ? $style['deps'] : false;
 
-            wp_register_style( $handle, $style['src'], $deps );
+            wp_register_style( $handle, $style['src'], $deps, ! empty( $style['version'] ) ? $style['version'] : false );
         }
 
         $localize = $this->get_localize();
@@ -124,5 +156,17 @@ class Assets {
         foreach ( $localize as $handle => $vars ) {
             wp_localize_script( $handle, 'boston', $vars );
         }
+    }
+
+    /**
+     * Loads the scripts to frontend
+     *
+     * @return void
+     */
+    public function load() {
+        if ( ! empty( $_GET['tab'] ) && $_GET['tab'] == 'messages' ) {
+            wp_enqueue_script( 'boston-messages-script' );
+        }
+
     }
 }

@@ -40,12 +40,7 @@
             })
             .on(`focusout`, function (e) {
                 $(this).removeClass(`modern-input`);
-            });
-
-        /**
-         * Handles messages section
-         */
-        load_messages($);
+            });        
     });
 })(jQuery);
 //Social login functions
@@ -282,27 +277,3 @@ function wizardLoad(isended = false) {
     }
 }
 
-/**
- * Handles message section
- */
-function load_messages($) {
-    let data = new FormData();
-
-    data.append(`action`, `get_messages`);
-    data.append(`nonce`, boston.messages_nonce);
-    // data.append(`action`, `get_messages`);
-
-    $.ajax({
-        type: `POST`,
-        url: boston.ajaxurl,
-        data: data,
-        contentType: false,
-        processData: false,
-        success: (response) => {
-            $(`.messages-body`).html(response);
-        },
-        error: (response) => {
-            wrong();
-        },
-    });
-}
