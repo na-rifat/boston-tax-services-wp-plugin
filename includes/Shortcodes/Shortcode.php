@@ -28,6 +28,29 @@ class Shortcode {
         add_shortcode( 'dashboard-user-profile', [$this->user, 'profile'] );
         add_shortcode( 'copy-of-questionnaire', [$this->user, 'copy_of_questionnaire'] );
         add_shortcode( 'boston-messages', [$this->messages, 'messages'] );
+        add_shortcode( 'boston-dashboard', [$this, 'boston_dashboard'] );
+
+    }
+
+    /**
+     * Return the exact dashboard content based on user type
+     *
+     * @param  [type] $atts
+     * @return void
+     */
+    public function boston_dashboard( $atts ) {
+
+        if ( strtolower( $this->user->info_list['account_type'] ) == 'client' ) {
+            if ( ! empty( $this->user->client_dashboard_slug ) ) {
+                return do_shortcode( "[boston-load-page slug={$this->user->client_dashboard_slug}]" );
+            }
+        } else if ( strtolower( $this->user->info_list['account_type'] ) == 'tax expert' ) {
+            if ( ! empty( $this->user->tax_expert_dashboard_slug ) ) {
+                return do_shortcode( "[boston-load-page slug={$this->user->tax_expert_dashboard_slug}]" );
+            }
+        }
+
+        return 'Sorry no pages found!';
     }
 
     /**
@@ -38,8 +61,10 @@ class Shortcode {
      * @return void
      */
     public function docusign_wizard() {
+
         return boston_template( __DIR__, 'docusign_agreement' );
         exit;
+
     }
 
     /**

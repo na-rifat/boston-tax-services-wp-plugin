@@ -12,6 +12,9 @@ class User {
     public $info_list;
     public $forms_table_suffix = 'db7_forms';
     public $form_list;
+    public $dashboard_slug;
+    public $client_dashboard_slug;
+    public $tax_expert_dashboard_slug;
 
     /**
      * Builds the class
@@ -33,6 +36,10 @@ class User {
         $this->current_user            = wp_get_current_user();
         $this->current_user_id         = $this->current_user->ID;
 
+        $this->dashboard_slug            = get_option( 'dashboard_page_slug' );
+        $this->client_dashboard_slug     = get_option( 'client_dashboard_page_slug' );
+        $this->tax_expert_dashboard_slug = get_option( 'tax_expert_dashboard_page_slug' );
+
         $this->info_list = $this->profile_info();
         $this->collect_forms_list();
 
@@ -46,15 +53,18 @@ class User {
      */
     public function check_for_redirection() {
 
-        if(is_admin())return;
+        if ( is_admin() ) {
+            return;
+        }
 
-        $dashboard_slug                  = get_option( 'dashboard_page_slug' );
-        $client_dashboard_slug           = get_option( 'client_dashboard_page_slug' );
-        $tax_expert_dashboard_slug       = get_option( 'tax_expert_dashboard_page_slug' );
+        $dashboard_slug                  = $this->dashboard_slug;
+        $client_dashboard_slug           = $this->client_dashboard_slug;
+        $tax_expert_dashboard_slug       = $this->tax_expert_dashboard_slug;
+        
         $restricted_pages_for_all        = explode( ', ', get_option( 'restricted_plages_for_all' ) );
         $restricted_pages_for_logged_out = explode( ', ', get_option( 'restricted_plages_for_logged_out' ) );
 
-        ! empty( $client_dashboard_slug ) && ! empty( $tax_expert_dashboard_slug ) ? 
+        ! empty( $client_dashboard_slug ) && ! empty( $tax_expert_dashboard_slug ) ?
         array_push( $restricted_pages_for_all, $client_dashboard_slug, $tax_expert_dashboard_slug ) : '';
 
         if ( is_page( $restricted_pages_for_all ) ) {
