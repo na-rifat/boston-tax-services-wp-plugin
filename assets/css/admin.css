@@ -1,0 +1,12 @@
+#boston-options .regular-text{
+    padding: 10px;
+}
+#boston-options input[type="submit"], #user-dashboard-settings input[type="submit"]{
+    padding: 8px 50px;
+}
+.boston-save-load{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px!important;
+}
