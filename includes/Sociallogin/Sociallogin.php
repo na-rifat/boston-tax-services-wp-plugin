@@ -81,7 +81,7 @@ class Sociallogin{
 	public function show_buttons(){
 		if( $this->social_enabled == true ){
 			?>
-			<div class="text-center">
+			<div class="text-center social-login-label">
 				<label><?php esc_html_e( 'Sign In With', 'boston' ) ?></label>
 			</div>
 			<ul class="list-unstyled list-inline social-login">

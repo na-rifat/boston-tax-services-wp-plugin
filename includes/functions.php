@@ -1,4 +1,5 @@
 <?php
+
     /**
      * This files contains all important functions for boston4sale website project
      */
@@ -49,7 +50,6 @@
         function jsversion( $filename ) {
             return filemtime( convert_path_slash( BOSTON_PATH . "/assets/js/$filename" ) );
         }
-
     }
     /**
      * Get css files version based on date modified
@@ -94,8 +94,8 @@
         /**
          * Returns a template for admin panel
          *
-         * @param [type] $dir
-         * @param [type] $filename
+         * @param  [type] $dir
+         * @param  [type] $filename
          * @return void
          */
         function boston_admin_template( $dir, $filename ) {
@@ -139,7 +139,7 @@
         function boston_form_action( $action ) {
             ob_start();
         ?>
-        <input type="hidden" name="action" value="<?php echo $action ?>"/>
+        <input type="hidden" name="action" value="<?php echo $action ?>" />
     <?php
         echo ob_get_clean();
             }
@@ -221,7 +221,7 @@
              * Returns formatted variable
              *
              * @param  [type] $var
-             * @return void
+             * @return void|string|int|array|mixed
              */
             function boston_var( $var ) {
                 return isset( $_POST[$var] ) && ! empty( $_POST[$var] ) ? $_POST[$var] : '';
@@ -270,20 +270,49 @@
             }
         }
 
+        if ( ! function_exists( 'boston_folder_index2name' ) ) {
+            function boston_folder_index2name( $index ) {
+                $folder_index = [
+                    't0' => 'W2/Income documents',
+                    't1' => 'Business & other relevant expenses',
+                    't2' => 'Draft Tax returns',
+                    't3' => 'Final Tax Returns',
+                ];
+                return $folder_index[$index];
+            }
+        }
+
         if ( ! function_exists( 'folder_info' ) ) {
             function folder_info( $name = '' ) {
             ob_start();
-            ?> <div class="folder-logo"><img src="<?php echo imgfile( 'folder.png' ) ?>"  src="<?php _e( $name, 'boston-tax' )?>" > </div>
-                        <div class="folder-title" data-folder-index="<?php echo boston_folder_name2index( $name ) ?>"><?php _e( $name, 'boston-tax' )?></div>
-            <?php
-                return ob_get_clean();
-                    }
-                }
+            ?> <div class="folder-logo"><img src="<?php echo imgfile( 'folder.png' ) ?>" src="<?php _e( $name, 'boston-tax' )?>"> </div>
+        <div class="folder-title" data-folder-index="<?php echo boston_folder_name2index( $name ) ?>"><?php _e( $name, 'boston-tax' )?></div>
+<?php
+    return ob_get_clean();
+        }
+    }
 
-                if ( ! function_exists( 'boston_active_tab' ) ) {
-                    function boston_active_tab( $tab_name ) {
-                        if ( ! empty( $_GET['tab'] ) && $_GET['tab'] == $tab_name ) {
-                            return ' id="active-tab" ';
-                        }
-                }
+    if ( ! function_exists( 'boston_active_tab' ) ) {
+        function boston_active_tab( $tab_name ) {
+            if ( ! empty( $_GET['tab'] ) && $_GET['tab'] == $tab_name ) {
+                return ' id="active-tab" ';
             }
+        }
+    }
+
+    if ( ! function_exists( 'array2options' ) ) {
+        function array2options( $array ) {
+            $result = '';
+            foreach ( $array as $item ) {
+                $caption = ucwords( $item );
+                $result .= "<option value='{$item}'>{$caption}</option";
+            }
+            return $result;
+        }
+    }
+
+    if ( ! function_exists( 'std2array' ) ) {
+        function std2array( $std ) {
+            return json_decode( json_encode( $std ), true );
+    }
+}

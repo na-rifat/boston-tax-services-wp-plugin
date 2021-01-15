@@ -40,9 +40,97 @@
             })
             .on(`focusout`, function (e) {
                 $(this).removeClass(`modern-input`);
-            });        
+            });
+
+        /**
+         * Calendly functions
+         */
+
+        $(`.meeting-scheduler`).click(function (e) {
+            Calendly.initPopupWidget({
+                url: "https://calendly.com/nuraalamrifat/15min",
+            });
+            return false;
+        });
+
+        window.addEventListener("message", function (e) {
+            if (isCalendlyEvent(e)) {
+                console.log(e.data.event);
+                // calendly.event_scheduled
+
+                // jQuery(`iframe[src="https://calendly.com/nuraalamrifat/15min?embed_domain=localhost&embed_type=PopupText"]`).contents().find(`div[data-id="details-highlighted-item"]`)
+                if (e.data.event == `calendly.event_scheduled`) {
+                    /**
+                     * Successfully scheduled an meeting, now let the server know
+                     */
+                    let params = {
+                        type: `POST`,
+                        url: boston.ajaxurl,
+                        dataType: `json`,
+                        data: {
+                            action: `process_calendly`,
+                            nonce: boston.calendly_nonce,
+                        },
+                        success: (response) => {
+                            if (response.success) {
+                                // alert(`Your schedule processed successfully!`)
+                            }
+                        },
+                        error: (response) => {
+                            wrong();
+                        },
+                    };
+                    $.ajax(params);
+                }
+            }
+        });
+
+        /**
+         * Load client manage option
+         */
+
+        $(`.manage-client-from-expert`).click(function (e) {
+            let self = $(this);
+
+            loadSpin(self.parent().find(`.small-loader`));
+
+            let client_id = self.data(`client-id`);
+
+            let data = {
+                action: `client_option_manager`,
+                nonce: boston.client_option_manager_nonce,
+                client_id: client_id,
+            };
+
+            $.ajax({
+                type: `POST`,
+                url: boston.ajaxurl,
+                dataType: `json`,
+                data: data,
+                success: (res) => {
+                    loadSpin(self.parent().find(`.small-loader`), true);
+                    console.log(res);
+                    if (res.success) {
+                        $(`body`).append(res.data.element);
+                        $(`.manage-client`).hide(0, function (e) {
+                            $(this).show(500);
+                        });
+                    }
+                },
+                error: () => {
+                    $(`body`).append(res.data.element);
+                    alert(
+                        `Something wrong happen with server or your internet connection!`
+                    );
+                },
+            });
+        });
     });
 })(jQuery);
+function isCalendlyEvent(e) {
+    return e.data.event && e.data.event.indexOf("calendly") === 0;
+}
+
 //Social login functions
 jQuery(document).ready(function ($) {
     xy_days();
@@ -197,6 +285,7 @@ function docInit($) {
      * wizard update function
      */
     $(document).on(`wpcf7mailsent`, function (event) {
+
         let formId = event.detail.contactFormId;
 
         if (
@@ -220,6 +309,9 @@ function docInit($) {
             contentType: false,
             data: data,
             success: (response) => {
+                if(  formId == boston.wizard_form_id_3){
+                    window.location.reload();
+                }
                 wizardLoad(true);
                 $(`#wizard-layout, #wizard-layout`).html(response);
                 docInit($);
@@ -277,3 +369,19 @@ function wizardLoad(isended = false) {
     }
 }
 
+/**
+ * Shows or hides the loading spin
+ * @param {object} elem
+ * @param {boolean} end
+ */
+function loadSpin(elem, end = false) {
+    if (!end) {
+        elem.css({
+            display: `inline-block`,
+        });
+    } else {
+        elem.css({
+            display: `none`,
+        });
+    }
+}

@@ -42,7 +42,6 @@ class BostonTax {
     public function activate() {
         $installer = new Installer();
         $installer->init();
-
     }
 
     /**
@@ -64,13 +63,27 @@ class BostonTax {
      * @return void
      */
     public function initialize() {
+        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+            $ajax = new Ajax();
+        }
+
         new Assets();
-        $wizard   = new Wizard\Wizard();
         $user     = new User\User();
         $messages = new Messages\Messages();
+        $wizard   = new Wizard\Wizard();
+        $file     = new File\File();
+
+        $messages->user = $user;
+        $wizard->user   = $user;
+        $user->file     = $file;
+        $user->messages = $messages;
+        $file->user     = $user;
+        if ( isset( $ajax ) ) {
+            $ajax->messages = $messages;
+            $ajax->user     = $user;
+        }
 
         new Shortcode( $wizard, $user, $messages );
-        new File\File();
 
         if ( ! is_admin() ) {
 
@@ -79,17 +92,10 @@ class BostonTax {
                 new Sociallogin();
             }
         } else {
-            new Admin\Admin();
+            $admin = new Admin\Admin( $user );
         }
 
-        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-            new Ajax();
-        }
     }
-
-    /**
-     *
-     */
 
     /**
      * Defines important constants
@@ -117,4 +123,5 @@ class BostonTax {
 function load() {
     return BostonTax::init();
 }
+
 load();

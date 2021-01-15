@@ -4,7 +4,9 @@ namespace Boston\Menu;
  * Handles admin menu
  */
 class Adminmenu {
-    function __construct() {
+    public $user;
+    function __construct($user) {
+        $this->user = $user;
         add_action( 'admin_menu', [$this, 'register_menu'] );
     }
 
@@ -14,11 +16,11 @@ class Adminmenu {
      * @return void
      */
     public function register_menu() {
-        $parent_slug = 'boston';
+        $parent_slug = 'options-general.php';
         $capability  = 'manage_options';
 
-        add_menu_page( 'Boston', 'Boston', $capability, 'boston', [$this, 'menu_page'], 'dashicons-admin-tools', 2 );
-        add_submenu_page( $parent_slug, 'Boston', 'Boston', $capability, $parent_slug, [$this, 'menu_page'] );
+        add_menu_page( 'Current year clients', 'Current year clients', $capability, 'current-year-clients', [$this->user, 'assigned_clients'], 'dashicons-groups', 2 );
+        add_submenu_page( $parent_slug, 'Boston social login', 'Boston social login', $capability, 'boston-social-login', [$this, 'menu_page'] );
         add_submenu_page( $parent_slug, 'User dashboard settings', 'User dashboard settings', $capability, 'boston-user-dashbaord-settings', [$this, 'user_dashboard_settings'] );
     }
 

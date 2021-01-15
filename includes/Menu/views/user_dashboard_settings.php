@@ -239,33 +239,7 @@
                         class="regular-text"
                     >
                 </td>
-            </tr>
-            <tr>
-                <th><label for="client_dashboard_page_slug">Client dashboard page slug</label></th>
-                <td>
-                    <input
-                        type="text"
-                        placeholder="slug-slug"
-                        name="client_dashboard_page_slug"
-                        id="client_dashboard_page_slug"
-                        value="<?php echo boston_get_option( 'client_dashboard_page_slug' ) ?>"
-                        class="regular-text"
-                    >
-                </td>
-            </tr>
-            <tr>
-                <th><label for="tax_expert_dashboard_page_slug">Tax expert dashboard page slug</label></th>
-                <td>
-                    <input
-                        type="text"
-                        placeholder="slug-slug"
-                        name="tax_expert_dashboard_page_slug"
-                        id="tax_expert_dashboard_page_slug"
-                        value="<?php echo boston_get_option( 'tax_expert_dashboard_page_slug' ) ?>"
-                        class="regular-text"
-                    >
-                </td>
-            </tr>
+            </tr> 
 
             <tr>
                 <th><label for="restricted_plages_for_all">Restricted pages for all</label></th>

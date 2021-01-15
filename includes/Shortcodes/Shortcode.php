@@ -17,40 +17,48 @@ class Shortcode {
         $this->wizard   = $wizard;
         $this->user     = $user;
         $this->messages = $messages;
-        add_shortcode( 'user-dashboard-menu', [$this, 'user_dashboard_menu'] );
-        add_shortcode( 'boston-user-dashboard', [$this, 'boston_user_dashboard'] );
+
+        add_shortcode( 'user-dashboard-menu', [$this->user, 'user_dashboard_menu'] );
+        add_shortcode( 'boston-user-dashboard-contents', [$this->user, 'boston_user_dashboard_contents'] );
+
+        add_shortcode( 'boston-messages', [$this->messages, 'messages'] );
+        add_shortcode( 'copy-of-questionnaire', [$this->user, 'copy_of_questionnaire'] );
+
+        add_shortcode( 'boston-user-wizard', [$this->wizard, 'output_wizard'] );
+        add_shortcode( 'boston-docusign-wizard', [$this, 'docusign_wizard'] );
+        add_shortcode( 'agreement-accept', [$this, 'agreement_accept'] );
+
         add_shortcode( 'boston-echo', [$this, 'boston_echo'] );
         add_shortcode( 'boston-load-page', [$this, 'boston_load_page'] );
         add_shortcode( 'social-login-buttons', [$this, 'social_login_buttons'] );
-        add_shortcode( 'boston-user-wizard', [$this->wizard, 'output_wizard'] );
-        add_shortcode( 'agreement-accept', [$this, 'agreement_accept'] );
-        add_shortcode( 'boston-docusign-wizard', [$this, 'docusign_wizard'] );
-        add_shortcode( 'dashboard-user-profile', [$this->user, 'profile'] );
-        add_shortcode( 'copy-of-questionnaire', [$this->user, 'copy_of_questionnaire'] );
-        add_shortcode( 'boston-messages', [$this->messages, 'messages'] );
-        add_shortcode( 'boston-dashboard', [$this, 'boston_dashboard'] );
 
+        add_shortcode( 'debug-test-function', [$this, 'debug_test_function'] );
+        add_shortcode( 'boston-full-width-dashboard', [$this, 'boston_full_width_dashboard'] );
+    }
+
+    public function boston_full_width_dashboard($atts){
+        ob_start();
+        include __DIR__ . "/views/full_width.php";
+        return ob_get_clean();
     }
 
     /**
-     * Return the exact dashboard content based on user type
+     * Uses for debug purposes
      *
-     * @param  [type] $atts
      * @return void
      */
-    public function boston_dashboard( $atts ) {
+    public function debug_test_function() {
+    var_dump($this->user->profile_info( 1 ));
 
-        if ( strtolower( $this->user->info_list['account_type'] ) == 'client' ) {
-            if ( ! empty( $this->user->client_dashboard_slug ) ) {
-                return do_shortcode( "[boston-load-page slug={$this->user->client_dashboard_slug}]" );
-            }
-        } else if ( strtolower( $this->user->info_list['account_type'] ) == 'tax expert' ) {
-            if ( ! empty( $this->user->tax_expert_dashboard_slug ) ) {
-                return do_shortcode( "[boston-load-page slug={$this->user->tax_expert_dashboard_slug}]" );
-            }
-        }
-
-        return 'Sorry no pages found!';
+        return;
+        global $super_admins;
+        var_dump( $super_admins );return;
+        return $this->user->account_type;
+        // return $this->user->assign_to_current_session('', get_userdata(7));
+        var_dump( $this->user->assgined_clients_data_list( [] ) );
+        return;
+        return $this->user->assigned_clients_count();
+        return $this->user->current_year_tax_documents_count();
     }
 
     /**
@@ -63,7 +71,6 @@ class Shortcode {
     public function docusign_wizard() {
 
         return boston_template( __DIR__, 'docusign_agreement' );
-        exit;
 
     }
 

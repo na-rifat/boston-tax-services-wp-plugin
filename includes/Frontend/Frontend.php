@@ -9,6 +9,16 @@ class Frontend {
     public function __construct() {
         add_action( 'wp_enqueue_scripts', [$this, 'enqueue_scripts'] );
         add_filter( 'wp_nav_menu_args', [$this, 'menu_controller'] );
+        add_action( 'um_after_form', [$this, 'initialize_social_login_buttons'] );
+    }
+
+    /**
+     * Initializes social login buttons
+     *
+     * @return void
+     */
+    public function initialize_social_login_buttons() {
+        do_shortcode( '[social-login-buttons]' );
     }
 
     /**

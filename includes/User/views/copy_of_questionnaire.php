@@ -1,56 +1,60 @@
 <div class="wrap">
             <div id="welcome-panel" class="welcome-panel">
                 <div class="welcome-panel-content">
-                    <div class="welcome-panel-column-container">                       
+                    <div class="welcome-panel-column-container">
                         <?php
 
-                            foreach ( $form_data as $key => $data ):
+                            if ( ! empty( $form_data ) ) {
+                                foreach ( $form_data as $key => $data ):
 
-                                $matches = array();
+                                    $matches = array();
 
-                                if ( $key == 'cfdb7_status' ) {
-                                    continue;
-                                }
+                                    if ( $key == 'cfdb7_status' ) {
+                                        continue;
+                                    }
 
-                                if ( $rm_underscore ) {
-                                    preg_match( '/^_.*$/m', $key, $matches );
-                                }
+                                    if ( $rm_underscore ) {
+                                        preg_match( '/^_.*$/m', $key, $matches );
+                                    }
 
-                                if ( ! empty( $matches[0] ) ) {
-                                    continue;
-                                }
+                                    if ( ! empty( $matches[0] ) ) {
+                                        continue;
+                                    }
 
-                                if ( strpos( $key, 'cfdb7_file' ) !== false ) {
+                                    if ( strpos( $key, 'cfdb7_file' ) !== false ) {
 
-                                    $key_val = str_replace( 'cfdb7_file', '', $key );
-                                    $key_val = str_replace( 'your-', '', $key_val );
-                                    $key_val = str_replace( array( '-', '_' ), ' ', $key_val );
-                                    $key_val = ucwords( $key_val );
-                                    echo '<p><b>' . $key_val . '</b>: <a href="' . $cfdb7_dir_url . '/' . $data . '">'
-                                        . $data . '</a></p>';
-                                } else {
-
-                                    if ( is_array( $data ) ) {
-
-                                        $key_val      = str_replace( 'your-', '', $key );
-                                        $key_val      = str_replace( array( '-', '_' ), ' ', $key_val );
-                                        $key_val      = ucwords( $key_val );
-                                        $arr_str_data = implode( ', ', $data );
-                                        $arr_str_data = esc_html( $arr_str_data );
-                                        echo '<p><b>' . $key_val . '</b>: ' . nl2br( $arr_str_data ) . '</p>';
-
+                                        $key_val = str_replace( 'cfdb7_file', '', $key );
+                                        $key_val = str_replace( 'your-', '', $key_val );
+                                        $key_val = str_replace( array( '-', '_' ), ' ', $key_val );
+                                        $key_val = ucwords( $key_val );
+                                        echo '<p><b>' . $key_val . '</b>: <a href="' . $cfdb7_dir_url . '/' . $data . '">'
+                                            . $data . '</a></p>';
                                     } else {
 
-                                        $key_val = str_replace( 'your-', '', $key );
-                                        $key_val = str_replace( array( '-', '_' ), ' ', $key_val );
+                                        if ( is_array( $data ) ) {
 
-                                        $key_val = ucwords( $key_val );
-                                        $data    = esc_html( $data );
-                                        echo '<p><b>' . $key_val . '</b>: ' . nl2br( $data ) . '</p>';
+                                            $key_val      = str_replace( 'your-', '', $key );
+                                            $key_val      = str_replace( array( '-', '_' ), ' ', $key_val );
+                                            $key_val      = ucwords( $key_val );
+                                            $arr_str_data = implode( ', ', $data );
+                                            $arr_str_data = esc_html( $arr_str_data );
+                                            echo '<p><b>' . $key_val . '</b>: ' . nl2br( $arr_str_data ) . '</p>';
+
+                                        } else {
+
+                                            $key_val = str_replace( 'your-', '', $key );
+                                            $key_val = str_replace( array( '-', '_' ), ' ', $key_val );
+
+                                            $key_val = ucwords( $key_val );
+                                            $data    = esc_html( $data );
+                                            echo '<p><b>' . $key_val . '</b>: ' . nl2br( $data ) . '</p>';
+                                        }
                                     }
-                                }
 
-                            endforeach;
+                                endforeach;
+                            } else {
+                                echo 'No forms found!';
+                            }
 
                             $form_data['cfdb7_status'] = 'read';
                             $form_data                 = serialize( $form_data );

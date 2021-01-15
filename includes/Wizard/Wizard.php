@@ -9,15 +9,17 @@ class Wizard {
     public $current_user;
     public $step_prefix  = 'user_wizard_step_';
     public $con_meta_key = 'wizard_current_con';
+    public $user;
 
     /**
      * Builds the class
      */
     public function __construct() {
+
         add_action( 'init', [$this, 'initialize'] );
         add_action( 'enqeueu_assets', [$this, 'enqeueu_assets'] );
-
         boston_ajax( 'update_wizard', [$this, 'update_wizard'] );
+
     }
 
     public function enqeueu_assets() {
@@ -32,23 +34,23 @@ class Wizard {
      */
     public function initialize() {
         $this->current_user = get_current_user_id();
-
         if ( ! is_admin() && is_user_logged_in() ) {
-            add_action( 'login_redirect', [$this, 'login_redirect'] );
             add_action( 'wp', [$this, 'page_redirect'] );
         }
+        
+        add_action( 'wp', [$this, 'admin_redirect'] );
     }
 
-    /**
-     * Check the current wizard step and redirect to a page
-     *
-     * @return void
-     */
-    public function login_redirect() {
-        if ( get_user_meta( $this->current_user, 'wizard_current_con', true ) != '5' ) {
-            wp_redirect( site_url( get_option( 'wizard_page_slug' ) ), 301 );
-        } else if ( get_user_meta( $this->current_user, 'wizard_current_con', true ) == '5' ) {
-            wp_redirect( site_url( get_user_meta( $this->current_user, 'dashboard_page_slug', true ) ) );
+    public function admin_redirect() {
+        $roles = get_userdata( get_current_user_id() );
+
+        if ( $roles != false ) {
+            $roles = $roles->roles;
+        }
+
+        if ( is_page( get_option( 'dashboard_page_slug' ) ) && in_array( 'administrator', $roles ) ) {
+            wp_redirect( admin_url( '/admin.php?page=current-year-clients' ), 301 );
+            return;
         }
     }
 
@@ -59,9 +61,20 @@ class Wizard {
      */
     public function page_redirect() {
 
-        if ( is_page( get_option( 'dashboard_page_slug' ) ) && get_user_meta( $this->current_user, 'wizard_current_con', true ) != '5' ) {
-            wp_redirect( site_url( "/" . get_option( 'wizard_page_slug' ), 301 ) );
+        if ( $this->user->account_type( $this->user->info_list['id'] ) != 'client' ) {
+            return;
         }
+
+        if ( is_page( get_option( 'dashboard_page_slug' ) ) && get_user_meta( $this->current_user, 'wizard_current_con', true ) != '5' ) {
+            wp_redirect( site_url( "/" . get_option( 'wizard_page_slug' ) ), 301 );
+            return;
+        }
+
+        if ( is_page( get_option( 'wizard_page_slug' ) ) && get_user_meta( get_current_user_id(), 'wizard_current_con', true ) == 5 ) {
+            wp_redirect( site_url( '/' . get_option( 'dashboard_page_slug' ) ), 301 );
+            return;
+        }
+
     }
 
     /**
@@ -90,11 +103,10 @@ class Wizard {
                 return do_boston_shortcodes( $step, 'wizard-layout' );
                 break;
             default:
-                do_boston_shortcodes( "{$this->step_prefix}1" );
                 update_user_meta( $this->current_user, $this->con_meta_key, '1' );
+                return do_boston_shortcodes( "{$this->step_prefix}1" );
                 break;
         }
-        exit;
     }
 
     /**

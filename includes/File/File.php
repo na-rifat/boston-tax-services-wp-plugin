@@ -10,6 +10,9 @@ class File {
     public $upload_path;
     public $upload_url;
     public $files;
+    public $db;
+    public $prefix;
+    public $user;
 
     /**
      * Builds the class
@@ -24,13 +27,150 @@ class File {
      * @return void
      */
     public function init() {
+        global $wpdb;
         $this->current_user = get_current_user_id();
         $this->prepare_path();
+        $this->db     = $wpdb;
+        $this->prefix = $this->db->prefix;
 
         add_shortcode( 'boston-file-view', [$this, 'manager_view'] );
         add_action( 'wp_enqueue_scripts', [$this, 'enqueue_assets'] );
         boston_ajax( 'upload_tax_file', [$this, 'upload_tax_file'] );
         boston_ajax( 'boston_get_file_list', [$this, 'boston_get_file_list'] );
+        boston_ajax( 'upload_file_from_expert', [$this, 'upload_file_from_expert'] );
+        boston_ajax( 'approve_file', [$this, 'approve_file'] );
+
+    }
+
+    /**
+     * Updates status to approve of a specific file
+     *
+     * @return void
+     */
+    public function approve_file() {
+        if ( ! wp_verify_nonce( boston_var( 'nonce' ), 'approve_file' ) ) {
+            wp_send_json_error(
+                [
+                    'message' => __( 'Invalid nonce!' ),
+                ]
+            );
+            exit;
+        }
+
+        $file_id = boston_var( 'file_id' );
+        $status  = 'Approved';
+
+        if ( $this->current_file_status( $file_id ) == 'Approved' ) {
+            $status = 'Amend';
+        }
+
+        $success = $this->db->update(
+            "{$this->prefix}boston_user_file_records",
+            [
+                'status' => $status,
+            ],
+            [
+                'id'   => $file_id,
+                'user' => $this->current_user,
+            ],
+            [
+                '%s',
+            ]
+        );
+
+        if ( $success ) {
+            wp_send_json_success();
+            exit;
+        } else {
+            wp_send_json_error(
+                [
+                    'Unable to update approve status!',
+                ]
+            );
+            exit;
+        }
+    }
+
+    /**
+     * Returns current status of a file
+     * 
+     * Approved|Amend
+     *
+     * @param [type] $file_id
+     * @return void
+     */
+    public function current_file_status( $file_id ) {
+        return $this->db->get_row(
+            $this->db->prepare(
+                "SELECT status FROM {$this->prefix}boston_user_file_records WHERE id={$file_id}"
+            )
+        )->status;
+    }
+
+    /**
+     * Uploads file from tax expert
+     *
+     * @return void
+     */
+    public function upload_file_from_expert() {
+        // $atts = [
+        //     'nonce'=>boston_var('nonce'),
+        //     'folder'=>boston_var('folder'),
+        //     'tab'=>boston_var('tab'),
+        //     'date'=>''
+        // ];
+
+        if ( filesize( $_FILES['tax_file']['tmp_name'] ) != 0 ) {
+            $file = $_FILES['tax_file'];
+        } else {
+            echo "Something went wrong with the file!";
+            exit;
+        }
+
+        if ( empty( $_POST['tab'] ) || empty( $_POST['folder'] ) ) {
+            echo "Tab number or folder is missing!";
+            exit;
+        }
+
+        if ( ! wp_verify_nonce( boston_var( 'nonce' ), 'upload_file_from_expert' ) ) {
+            echo "Invalid nonce!";
+            exit;
+        }
+
+        $info = $this->process_file( $file );
+        print_r($info);
+        exit;
+    }
+
+    /**
+     * Deletes a file by file id
+     *
+     * @param  [type] $file_id
+     * @return void
+     */
+    public function delete_file( $file_id ) {
+
+    }
+
+    /**
+     * Returns a files path by it's id
+     *
+     * @param  [type] $file_id
+     * @return void
+     */
+    public function file_path( $file_id ) {
+
+    }
+
+    /**
+     * Replaces a file by another
+     *
+     * @param  [type] $file_id
+     * @param  [type] $file
+     * @return void
+     */
+    public function replace_file( $file_id, $file ) {
+
     }
 
     /**
@@ -44,7 +184,7 @@ class File {
         $folder = boston_var( 'folder' );
         $tab    = boston_var( 'tab' );
 
-        $last_april = mktime( 0, 0, 0, 4, 1, ( date( 'Y', time() ) - 1 ) );
+        $prior_years = mktime( 0, 0, 0, 12, 31, ( date( 'Y', time() ) - 1 ) );
 
         if ( $tab == 'current-year-taxes' ) {
             $selector = '>';
@@ -56,7 +196,7 @@ class File {
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}boston_user_file_records WHERE folder='{$folder}'
                 AND user={$this->current_user}
-                AND CAST(date as INT) {$selector} $last_april
+                AND CAST(date as INT) {$selector} $prior_years
                "
             )
         );
@@ -94,7 +234,22 @@ class File {
 
         $result = $this->insert_file_record( $info );
 
-        var_dump( $result );
+    }
+
+    /**
+     * Uploads a file
+     *
+     * @param  [type] $atts
+     * @return void
+     */
+    public function upload( $atts ) {
+
+        $info = $this->process_file( $atts['file'] );
+
+        move_uploaded_file( $info['tmp_name'], $info['destination'] );
+
+        $result = $this->insert_file_record( $info );
+
     }
 
     /**
@@ -115,7 +270,9 @@ class File {
     public function manager_view( $atts ) {
         switch ( $atts['view'] ) {
             case 'current-year-taxes':
-                return boston_template( __DIR__, 'file_manager' );
+                ob_start();
+                include __DIR__ . "/views/file_manager.php";
+                return ob_get_clean();
                 break;
             case 'prior-year-taxes':
                 return boston_template( __DIR__, 'file_manager' );
@@ -157,6 +314,7 @@ class File {
         $result['tab']          = boston_var( 'tab' );
         $result['folder']       = boston_var( 'folder' );
         $result['date']         = floor( intval( boston_var( 'date' ) ) / 1000 );
+        $result['status']       = 'Not approved';
 
         return $result;
     }
@@ -197,6 +355,7 @@ class File {
             'tab'          => $atts['tab'],
             'folder'       => $atts['folder'],
             'date'         => $atts['date'],
+            'status'       => $atts['status'],
         ];
 
         // return $data;
@@ -213,6 +372,7 @@ class File {
                 '%s',
                 '%s',
                 '%d',
+                '%s',
                 '%s',
                 '%s',
                 '%s',

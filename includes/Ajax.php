@@ -6,7 +6,12 @@ namespace Boston;
  * Handles ajax requests
  */
 class Ajax {
+    /**
+     * @var mixed
+     */
     public $current_user;
+    public $messages;
+    public $user;
     /**
      * Builds the class
      */
@@ -14,7 +19,68 @@ class Ajax {
         boston_ajax( 'boston_options', [$this, 'save_options'] );
         boston_ajax( 'save_dashboard_shortcodes', [$this, 'save_dashboard_shortcodes'] );
         boston_ajax( 'user_agreement_accept', [$this, 'user_agreement_accept'] );
+        boston_ajax( 'process_calendly', [$this, 'process_calendly'] );
+
         add_action( 'init', [$this, 'init'] );
+    }
+
+    /**
+     * Process the calendly request
+     *
+     * @return void
+     */
+    public function process_calendly() {
+
+        if ( $this->current_user == 0 ) {
+            wp_send_json_error( [
+                'message' => 'You\'re not logged in',
+            ] );
+            return;
+        }
+
+        if ( ! wp_verify_nonce( boston_var( 'nonce' ), 'process_calendly' ) ) {
+            wp_send_json_error( [
+                'message' => 'Invalid nonce!',
+            ] );
+            return;
+        }
+
+        $to_profile = $this->user->profile_info( $this->current_user );
+
+        $expert_profile = $this->user->profile_info( $this->user->current_expert( $to_profile['id'] ) );
+
+        $admin_email =get_option('admin_email');
+
+        $data = [
+            'to'              => $to_profile['full_name'],
+            'to_id'           => $to_profile['id'],
+            'from'            => '',
+            'from_id'         => 0,
+            'message_type'    => 'information',
+            'message_content' => "You apppointed a meeting with {$expert_profile['full_name']} (Tax expert)",
+        ];
+
+        $result = $this->messages->send_message( $data );
+
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error(
+                [
+                    'message' => __( 'Unable to send an appointment message', 'boston-tax' ),
+                ]
+            );
+            exit;
+        } else {
+            // send a mail to clients email
+            $body = "Hello {$to_profile['first_name']}\nRecently you appointed a meeting with your tax expert {$expert_profile['first_name']}\nPlease upload your tax documents before scheduled meeting. \n\nFor any help kindly email us at {$admin_email}";
+            wp_mail( $to_profile['email'], 'You appointed a meeting with your tax expert', $body);
+            wp_send_json_success(
+                [
+                    'message' => __( 'Successfully sent appointment message', 'boston-tax' ),
+                ]
+            );
+            exit;
+        }
+
     }
 
     /**
@@ -25,6 +91,7 @@ class Ajax {
     public function init() {
         $this->current_user = get_current_user_id();
     }
+
     /**
      * Handles the agreement accept function
      *
@@ -74,7 +141,7 @@ class Ajax {
     }
 
     /**
-     * Saves options
+     * Saves options from social login page
      *
      * @return void
      */
@@ -106,6 +173,11 @@ class Ajax {
         exit;
     }
 
+    /**
+     * Saves shortcodes and other options from user dashboardd settings page
+     *
+     * @return void
+     */
     public function save_dashboard_shortcodes() {
 
         if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'save_dashboard_shortcodes' ) ) {

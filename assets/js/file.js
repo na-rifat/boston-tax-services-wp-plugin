@@ -8,7 +8,7 @@
         });
 
         $(`#tax_file`).change(function (e) {
-            $(`.uploader .loader`).css({ display: "inline-block" });
+            $(`.uploader .small-loader`).addClass(`is-loading`);
             let file = $(`#tax_file`)[0].files[0];
             let tab = jQuery(`#active-tab`).data("tab-name");
             let folder = $(`#active-folder .folder-title`).data(`folder-index`);
@@ -27,20 +27,16 @@
                 data: data,
                 contentType: false,
                 processData: false,
-                success: (response) => {
-                    console.clear();
-                    console.log(response);
-
-                    $(`.uploader .loader`).css({ display: "none" });
+                success: (response) => {                    
+                    $(`.uploader .small-loader`).removeClass(`is-loading`);
                     $(`#tax_file`).val(``);
-
+                    
                     get_file_list();
                     $(`.upload-button`).prop(`disabled`, false);
                 },
-                error: (response) => {
-                    console.clear();
-                    console.log(response);
-                    alert("");
+                error: (response) => {                    
+                    alert("Something went wrong!");
+                    $(`#tax_file`).val(``);
                 },
             });
         });
@@ -48,18 +44,19 @@
         $(`.folder`).click(function () {
             $(`#active-folder`).removeAttr(`id`);
             $(this).attr(`id`, `active-folder`);
-            
-            get_file_list();           
+
+            get_file_list();
         });
     });
 })(jQuery);
+
 function get_file_list() {
     // if (boston.current_page != boston.wizard_page) {
     //     return;
     // }
 
     jQuery(`.file-list`)
-        .html(`<div class="loader"></div>`)
+        .html(`<div class="medium-loader is-loading"></div>`)
         .addClass(`file-list-with-loader`);
     let tab = jQuery(`#active-tab`).data("tab-name");
     let folder = jQuery(`#active-folder .folder-title`).data(`folder-index`);
@@ -80,5 +77,52 @@ function get_file_list() {
                 .removeClass(`file-list-with-loader`);
         },
         error: () => {},
+    });
+}
+
+function upload_client_file() {
+    let $ = jQuery;
+    let self = $(`.upload-client-file`);
+    let file = $(`#upload_tax_file_from_expert`);
+
+    self.click(function (e) {
+        file.trigger(`click`);
+
+        file.on(`change`, function () {
+            self.find(`.small-loader`).addClass(`is-loading`);
+            let data = {
+                action: `upload_file_from_expert`,
+                nonce: boston.upload_file_from_expert_nonce,
+                folder: self.data(`folder-id`),
+                tab: `current-year-taxes`,
+                date: new Date().getTime(),
+                tax_file: file[0].files[0],
+            };
+
+            let formattedData = new FormData();
+
+            for (var key in data) {
+                formattedData.append(key, data[key]);
+            }
+
+            data = formattedData;
+
+            $.ajax({
+                type: `POST`,
+                url: boston.ajaxurl,
+                contentType: false,
+                processData: false,
+                data: data,
+                success: (res) => {   
+                    console.log(res)                 
+                    self.find(`.small-loader`).removeClass(`is-loading`);
+                    file.val(``);
+                },
+                error: () => {
+                    self.find(`.small-loader`).removeClass(`is-loading`);
+                    file.val(``);
+                },
+            });
+        });
     });
 }
