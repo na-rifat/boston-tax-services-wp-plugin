@@ -105,6 +105,7 @@ class Installer {
             `folder` varchar(100) NOT NULL,
             `status` varchar(100) NOT NULL,
             `date` varchar(1000) NOT NULL,
+            `uploaded_by` bigint NOT NULL,
             PRIMARY KEY (`id`)
            ) $this->charset_collate";
 

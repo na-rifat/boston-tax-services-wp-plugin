@@ -83,7 +83,7 @@ class BostonTax {
             $ajax->user     = $user;
         }
 
-        new Shortcode( $wizard, $user, $messages );
+        new Shortcode( $wizard, $user, $messages, $file );
 
         if ( ! is_admin() ) {
 

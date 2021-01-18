@@ -39,7 +39,123 @@ class File {
         boston_ajax( 'boston_get_file_list', [$this, 'boston_get_file_list'] );
         boston_ajax( 'upload_file_from_expert', [$this, 'upload_file_from_expert'] );
         boston_ajax( 'approve_file', [$this, 'approve_file'] );
+        boston_ajax( 'upload_prepared', [$this, 'upload_prepared'] );
+        boston_ajax( 'get_client_irs_correspondence', [$this, 'get_client_irs_correspondence'] );
+        boston_ajax( 'upload_irs_document', [$this, 'upload_irs_document'] );
+    }
 
+    /**
+     * Uploads IRS correspondence document from client
+     *
+     * @return void
+     */
+    function upload_irs_document() {
+        $atts = [
+            'nonce'  => boston_var( 'nonce' ),
+            'folder' => 'irs-correspondence',
+            'tab'    => 'irs-correspondence',
+        ];
+
+        if ( ! wp_verify_nonce( $atts['nonce'], 'upload_irs_document' ) ) {
+            echo $this->client_irs_correspondence_files( $this->user->current_user_id );
+            exit;
+        }
+
+        $p_info = $this->process_file( $_FILES['file'] );
+
+        $p_info['folder'] = $atts['folder'];
+        $p_info['tab']    = $atts['tab'];
+
+        $p_info['uploaded_by'] = $this->user->current_user_id;
+
+        move_uploaded_file( $p_info['tmp_name'], $p_info['destination'] );
+
+        unset(
+            $p_info['tmp_name'],
+        );
+
+        $this->insert_file_record( $p_info );
+
+        echo $this->client_irs_correspondence_files( $this->user->current_user_id );
+        exit;
+    }
+
+    /**
+     * Uploads preparedd file
+     *
+     * @return void
+     */
+    public function upload_prepared() {
+
+        if ( ! wp_verify_nonce( boston_var( 'nonce' ), 'upload_prepared' ) ) {
+            echo 1;
+            return;
+        }
+
+        if ( empty( boston_var( 'file_id' ) ) ) {
+            return;
+        }
+
+        $info = std2array( $this->file_info( boston_var( 'file_id' ) ) );
+
+        if ( ! $this->user->have_access_of_client( $info['user'], $this->user->current_user_id ) ) {
+            return;
+        }
+        $p_info                 = $this->process_file_for_update( $_FILES['file'] );
+        $p_info['destination']  = "{$this->upload_path}{$info['user']}_{$p_info['name']}_{$p_info['date']}.{$p_info['ext']}";
+        $p_info['storage_name'] = "{$info['user']}_{$p_info['name']}_{$p_info['date']}.{$p_info['ext']}";
+        $p_info['url']          = "$this->upload_url{$p_info['storage_name']}";
+
+        unlink( $info['destination'] );
+        move_uploaded_file( $_FILES['file']['tmp_name'], $p_info['destination'] );
+
+        // Update file info
+        $result = $this->db->update(
+            "{$this->prefix}boston_user_file_records",
+            [
+                'ext'          => $p_info['ext'],
+                'destination'  => $p_info['destination'],
+                'url'          => $p_info['url'],
+                'date'         => $p_info['date'],
+                'status'       => $p_info['status'],
+                'type'         => $p_info['type'],
+                'storage_name' => $p_info['storage_name'],
+                'uploaded_by'  => $this->user->current_user_id,
+            ],
+            ['id' => $info['id']],
+            [
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%d',
+            ],
+            [
+                '%d',
+            ]
+        );
+
+        $files_list = $this->user->files_of_client( $info['user'] );
+        echo $files_list;
+
+        exit;
+    }
+
+    /**
+     * Returns a file infromation by id
+     *
+     * @param  [type] $file_id
+     * @return void
+     */
+    public function file_info( $file_id ) {
+        return $this->db->get_row(
+            $this->db->prepare(
+                "SELECT * FROM {$this->prefix}boston_user_file_records WHERE id={$file_id}"
+            )
+        );
     }
 
     /**
@@ -93,10 +209,10 @@ class File {
 
     /**
      * Returns current status of a file
-     * 
+     *
      * Approved|Amend
      *
-     * @param [type] $file_id
+     * @param  [type] $file_id
      * @return void
      */
     public function current_file_status( $file_id ) {
@@ -113,13 +229,6 @@ class File {
      * @return void
      */
     public function upload_file_from_expert() {
-        // $atts = [
-        //     'nonce'=>boston_var('nonce'),
-        //     'folder'=>boston_var('folder'),
-        //     'tab'=>boston_var('tab'),
-        //     'date'=>''
-        // ];
-
         if ( filesize( $_FILES['tax_file']['tmp_name'] ) != 0 ) {
             $file = $_FILES['tax_file'];
         } else {
@@ -137,8 +246,17 @@ class File {
             exit;
         }
 
-        $info = $this->process_file( $file );
-        print_r($info);
+        $info                = $this->process_file( $file );
+        $info['user']        = boston_var( 'client_id' );
+        $info['uploaded_by'] = $this->user->current_user_id;
+
+        move_uploaded_file( $info['tmp_name'], $info['destination'] );
+
+        $this->insert_file_record( $info );
+
+        $files_list = $this->user->files_of_client( $info['user'] );
+        echo $files_list;
+
         exit;
     }
 
@@ -228,12 +346,14 @@ class File {
             exit;
         }
 
-        $info = $this->process_file( $file );
+        $info                = $this->process_file( $file );
+        $info['uploaded_by'] = $info['user'];
 
         move_uploaded_file( $info['tmp_name'], $info['destination'] );
 
         $result = $this->insert_file_record( $info );
 
+        return $result;
     }
 
     /**
@@ -320,6 +440,83 @@ class File {
     }
 
     /**
+     * Processes file information before update
+     *
+     * @param  [type] $file
+     * @return void
+     */
+    public function process_file_for_update( $file ) {
+        $result    = [];
+        $timestamp = time();
+
+        $result['tmp_name']     = $file['tmp_name'];
+        $result['real_name']    = $file['name'];
+        $result['type']         = $file['type'];
+        $result['size']         = $file['size'];
+        $result['ext']          = strtolower( explode( '.', $file['name'] )[sizeof( explode( '.', $file['name'] ) ) - 1] );
+        $result['name']         = explode( '.', $file['name'] )[0];
+        $result['storage_name'] = "{$this->current_user}_{$result['name']}_{$timestamp}.{$result['ext']}";
+        $result['destination']  = "{$this->upload_path}{$this->current_user}_{$result['name']}_{$timestamp}.{$result['ext']}";
+        $result['url']          = "$this->upload_url{$result['storage_name']}";
+        $result['date']         = $timestamp;
+        $result['status']       = 'Not approved';
+
+        return $result;
+    }
+
+    /**
+     * Processes file information for expert
+     *
+     * @param  [type] $file
+     * @return void
+     */
+    public function process_file_for_expert( $file ) {
+        $result    = [];
+        $timestamp = time();
+
+        $result['tmp_name']     = $file['tmp_name'];
+        $result['real_name']    = $file['name'];
+        $result['type']         = $file['type'];
+        $result['size']         = $file['size'];
+        $result['ext']          = strtolower( explode( '.', $file['name'] )[sizeof( explode( '.', $file['name'] ) ) - 1] );
+        $result['name']         = explode( '.', $file['name'] )[0];
+        $result['storage_name'] = "{$this->current_user}_{$result['name']}_{$timestamp}.{$result['ext']}";
+        $result['destination']  = "{$this->upload_path}{$this->current_user}_{$result['name']}_{$timestamp}.{$result['ext']}";
+        $result['url']          = "$this->upload_url{$result['storage_name']}";
+        $result['date']         = $timestamp;
+        $result['status']       = 'Not approved';
+
+        return $result;
+    }
+
+    /**
+     * Pretty prints a uploaded by name
+     *
+     * @param  [type] $id
+     * @return void
+     */
+    public function pretty_print_uploaded_by( $id ) {
+        $info = $this->user->profile_info( $id );
+        if ( in_array( 'administrator', $info['role'] ) ) {
+            return 'Admin';
+        }
+
+        if ( $info['account_type'] == 'client' && $info['id'] == $this->user->current_user_id ) {
+            return 'Me';
+        }
+
+        if ( $info['account_type'] == 'client' && $info['id'] != $this->user->current_user_id ) {
+            return 'Client';
+        }
+
+        if ( $info['account_type'] == 'tax expert' ) {
+            return 'Tax expert';
+        }
+
+        return 'Unknown or from system';
+    }
+
+    /**
      * Prepares the upload path
      *
      * @return void
@@ -356,6 +553,7 @@ class File {
             'folder'       => $atts['folder'],
             'date'         => $atts['date'],
             'status'       => $atts['status'],
+            'uploaded_by'  => $atts['uploaded_by'],
         ];
 
         // return $data;
@@ -376,6 +574,7 @@ class File {
                 '%s',
                 '%s',
                 '%s',
+                '%d',
             ]
         );
 
@@ -407,5 +606,61 @@ class File {
                 return imgfile( "file.png" );
                 break;
         }
+    }
+
+    /**
+     * Returns client IRS correspondence page
+     *
+     * @param  [type] $user_id
+     * @return void
+     */
+    public function client_irs_correspondence( $user_id ) {
+        ob_start();
+        include __DIR__ . "/views/client_irs_correspondence.php";
+        return ob_get_clean();
+    }
+
+    /**
+     * Returns IRS correspondence files with pretty elements
+     *
+     * @param  [type] $user_id
+     * @return void
+     */
+    public function client_irs_correspondence_files( $user_id ) {
+        $correspondence = std2array( $this->client_irs_correspondence_files_list( $user_id ) );
+
+        ob_start();
+        include __DIR__ . "/views/client_files_of_irs_correspondence.php";
+        return ob_get_clean();
+    }
+
+    /**
+     * Returns std object list of correspondence files
+     *
+     * @param  [type] $user_id
+     * @return void
+     */
+    public function client_irs_correspondence_files_list( $user_id ) {
+        return $this->db->get_results(
+            $this->db->prepare(
+                "SELECT * FROM {$this->prefix}boston_user_file_records WHERE user={$user_id} AND folder='irs-correspondence'"
+            )
+        );
+    }
+
+    /**
+     * Handles IRS correspondence file list request from AJAX
+     *
+     * @return void
+     */
+    public function get_client_irs_correspondence() {
+        $files = $this->client_irs_correspondence_files( $this->user->current_user_id );
+
+        wp_send_json_success(
+            [
+                'el' => $files,
+            ]
+        );
+        exit;
     }
 }

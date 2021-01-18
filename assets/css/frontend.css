@@ -729,13 +729,19 @@ span.unread-count {
     border-bottom: 1px dashed gray;
     padding: 10px 0;
 }
-
+.client-file-list{
+    font-size: .8em;
+}
 .client-file-list td * {
     vertical-align: middle;
 }
 .client-file-list .file-icon {
     height: 40px;
     width: auto;
+}
+.client-file-list td:nth-child(1){
+    min-width: 40px;
+
 }
 
 .boston-large.upload-client-file {
@@ -842,8 +848,9 @@ span.unread-count {
     border: none;
 }
 
-.client-profile .avatar-holder img {
-    border-radius: 50%;
+.client-profile .avatar-holder img, .expert-profile .avatar-holder img {
+    border-radius: 10%;
+    border: 2px solid white;
 }
 .client-profile tr + tr td:nth-child(1) {
     text-align: right;
@@ -868,9 +875,6 @@ span.unread-count {
     border: none;
 }
 
-.expert-profile .avatar-holder img {
-    border-radius: 50%;
-}
 .expert-profile tr + tr td:nth-child(1) {
     text-align: right;
     width: 60%;
@@ -967,3 +971,53 @@ span.unread-count {
 
 
 
+
+
+.mg5{
+    margin: 5px;
+}
+.mg5-ud{
+    margin: 5px 0;
+}
+.mg5-lr{
+    margin: 0 5px;
+}
+.mg8{
+    margin: 8px;
+}
+.mg8-ud{
+    margin: 8px 0;
+}
+.mg8-lr{
+    margin: 0 8px;
+}
+
+
+/* irs correspondence */
+.irs-correspondence-list td:nth-child(1) img{
+    height: 40px;
+    width: auto;
+}
+
+.irs-correspondence-list td *{
+    vertical-align: middle;
+}
+
+
+
+
+/* file manager */
+.file-name, .file-name *{
+    text-align: left;
+}
+
+.expert-irs-correspondence td:nth-child(1) img{
+    height: 40px;
+    width: auto;
+}
+.expert-irs-correspondence td * {
+    vertical-align: middle;
+}
+.expert-irs-correspondence {
+    font-size: .8em;
+}

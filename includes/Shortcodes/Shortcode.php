@@ -12,11 +12,13 @@ class Shortcode {
     public $wizard;
     public $user;
     public $messages;
+    public $file;
 
-    public function __construct( $wizard, $user, $messages ) {
+    public function __construct( $wizard, $user, $messages, $file ) {
         $this->wizard   = $wizard;
         $this->user     = $user;
         $this->messages = $messages;
+        $this->file     = $file;
 
         add_shortcode( 'user-dashboard-menu', [$this->user, 'user_dashboard_menu'] );
         add_shortcode( 'boston-user-dashboard-contents', [$this->user, 'boston_user_dashboard_contents'] );
@@ -34,9 +36,28 @@ class Shortcode {
 
         add_shortcode( 'debug-test-function', [$this, 'debug_test_function'] );
         add_shortcode( 'boston-full-width-dashboard', [$this, 'boston_full_width_dashboard'] );
+
+        add_shortcode( 'boston-client-irs-correspondence', [$this, 'client_irs_correspondence'] );
     }
 
-    public function boston_full_width_dashboard($atts){
+    /**
+     * Returns irs correspondence page for client
+     *
+     * @param [type] $atts
+     * @return void
+     */
+    public function client_irs_correspondence( $atts ) {
+        return $this->file->client_irs_correspondence($this->user->current_user_id);
+    }
+
+
+    /**
+     * Returns boston full width modern desgined dashboard page 
+     *
+     * @param [type] $atts
+     * @return void
+     */
+    public function boston_full_width_dashboard( $atts ) {
         ob_start();
         include __DIR__ . "/views/full_width.php";
         return ob_get_clean();
@@ -48,7 +69,7 @@ class Shortcode {
      * @return void
      */
     public function debug_test_function() {
-    var_dump($this->user->profile_info( 1 ));
+        var_dump( $this->user->profile_info( 1 ) );
 
         return;
         global $super_admins;

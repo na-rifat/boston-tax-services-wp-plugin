@@ -4,6 +4,7 @@
 <tr>
 <th></th>
 <th>File name</th>
+<th>Uploaded by</th>
 <th>Approved</th>
 <th>Upload date</th>
 </tr>
@@ -11,7 +12,8 @@
             <tr>
                 <td><img src="<?php echo $this->file_ext2ico( $file->ext ) ?>" alt="<?php _e( 'File icon', 'boston-tax' )?>"></td>
                 <td><a target="_blank" href="<?php echo $file->url ?>"><?php echo $file->name ?></a></td>
-                <td><input type="checkbox" name="approved" id="approved"                                                                         <?php echo $file->status == 'Approved' ? ' checked ' : '' ?> class="approve-file" data-file-id="<?php echo $file->id ?>"></td>
+                <td><?php echo $this->pretty_print_uploaded_by( $file->uploaded_by ) ?></td>
+                <td><input type="checkbox" name="approved" id="approved" <?php echo $file->status == 'Approved' ? ' checked ' : '' ?> class="approve-file" data-file-id="<?php echo $file->id ?>"></td>
                 <td><?php echo date( 'm/d/Y', $file->date ) ?></td>
             </tr>
         <?php }?>

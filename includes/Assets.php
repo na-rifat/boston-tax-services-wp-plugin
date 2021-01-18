@@ -153,6 +153,8 @@ class Assets {
                 ],
                 'mark_as_read_nonce'            => wp_create_nonce( 'mark_as_read' ),
                 'approve_file_nonce'            => wp_create_nonce( 'approve_file' ),
+                'upload_prepared_nonce'         => wp_create_nonce( 'upload_prepared' ),
+                'upload_irs_document_nonce'     => wp_create_nonce( 'upload_irs_document' ),
             ],
             'boston-messages-script' => [
                 'ajaxurl'        => admin_url( 'admin-ajax.php' ),
@@ -213,7 +215,7 @@ class Assets {
         }
 
         wp_enqueue_style( 'dashboard-styles' );
-            wp_enqueue_style( 'boston-fontawesome-style' );
+        wp_enqueue_style( 'boston-fontawesome-style' );
 
         // wp_enqueue_style('boston-bootstrap-style');
         /**

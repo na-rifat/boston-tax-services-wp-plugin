@@ -57,7 +57,7 @@ class User {
 
         add_action( 'template_redirect', [$this, 'check_for_redirection'] );
         add_action( 'wp_login', [$this, 'assign_to_current_session'], 10, 2 );
-        add_action( 'user_register', [$this, 'add_to_expert_list'] );
+        add_action( 'wp_login', [$this, 'add_to_expert_list'] );
 
         boston_ajax( 'assign_expert', [$this, 'assign_expert'] );
         boston_ajax( 'client_option_manager', [$this, 'client_option_manager'] );
@@ -179,7 +179,13 @@ class User {
      */
     public function add_to_expert_list( $id ) {
 
+        $id = $this->name2id($id);
+
         if ( $this->account_type( $id ) != 'tax expert' ) {
+            return;
+        }
+
+        if($this->have_in_expert_list($id)){
             return;
         }
 
@@ -209,6 +215,19 @@ class User {
         }
 
         return $insert_id;
+    }
+
+
+    /**
+     * Check from the database the expert listed in the DB
+     *
+     * @param [type] $id
+     * @return void
+     */
+    public function have_in_expert_list($id){
+        return $this->db->get_var(
+            "SELECT count(id) FROM {$this->prefix}boston_tax_experts WHERE user_id={$id}"
+        );
     }
 
     /**
@@ -1000,6 +1019,7 @@ class User {
         );
 
         $files = std2array( $files );
+        $irs = std2array($this->file->client_irs_correspondence_files_list($client_id));
 
         ob_start();
         include __DIR__ . "/views/manage_client_files.php";
@@ -1088,5 +1108,12 @@ class User {
             "SELECT count(id) FROM {$this->prefix}boston_currently_assigned_clients WHERE tax_expert_id={$expert_id}"
         );
     }
+
+    public function files_of_folder($files, $folder){
+        ob_start();
+        include __DIR__ . "/views/files_of_folder.php";
+        return ob_get_clean();
+    }
+
 
 }

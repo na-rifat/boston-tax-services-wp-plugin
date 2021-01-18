@@ -4,6 +4,7 @@
     data-to-id="<?php echo $atts['profile']['id'] ?>"
     data-from="<?php echo $atts['ai']['tax_expert_name'] ?>"
     data-from-id="<?php echo $atts['ai']['tax_expert_id'] ?>"
+    data-client-id="<?php echo $atts['profile']['id'] ?>"
     >
         <div class="close-button manage-client">x</div>
         <h2>Manage client</h2>
