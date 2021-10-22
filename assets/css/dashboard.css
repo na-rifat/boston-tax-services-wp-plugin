@@ -1,0 +1,7 @@
+.mkdf-page-header{
+    box-shadow: 0.5px 0.5px 3px grey;
+}
+
+.mkdf-page-header .full-width-dashboard ~ .mkdf-page-header{
+    box-shadow: 0.5px 0.5px 3px grey;
+}

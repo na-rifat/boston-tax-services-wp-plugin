@@ -1,0 +1,16 @@
+{
+  "name": "rafalotech/boston",
+  "description": "Manages Boston tax services website features",
+  "type": "wordpress-plugin",
+  "license": "GPL v2",
+  "minimum-stability": "dev",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Boston\\": "includes/"      
+    },
+    "files": [
+      "includes/functions.php"
+    ]
+  }
+}
