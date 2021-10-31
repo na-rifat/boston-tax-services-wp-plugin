@@ -23,27 +23,27 @@ class Assets {
      */
     public function get_scripts() {
         return [
-            'boston-frontend-script'         => [
+            'boston-frontend-script'  => [
                 'src'     => jsfile( 'frontend.js' ),
                 'version' => jsversion( 'frontend.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-admin-script'            => [
+            'boston-admin-script'     => [
                 'src'     => jsfile( 'admin.js' ),
                 'version' => jsversion( 'admin.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-file-script'             => [
+            'boston-file-script'      => [
                 'src'     => jsfile( 'file.js' ),
                 'version' => jsversion( 'file.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-messages-script'         => [
+            'boston-messages-script'  => [
                 'src'     => jsfile( 'messages.js' ),
                 'version' => jsversion( 'messages.js' ),
                 'deps'    => ['jquery'],
             ],
-            'boston-bootstrap-script'        => [
+            'boston-bootstrap-script' => [
                 'src'     => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js',
                 'version' => '3.3.5',
             ],
@@ -52,12 +52,12 @@ class Assets {
             //     'version' => jsversion( 'rich_text.js' ),
             //     'deps'    => ['jquery'],
             // ],
-            'boston-universal'               => [
+            'boston-universal'        => [
                 'src'     => jsfile( 'universal.js' ),
                 'version' => jsversion( 'universal.js' ),
                 'deps'    => ['jquery'],
             ],
-            'calendly'                       => [
+            'calendly'                => [
                 'src'     => 'https://calendly.com/assets/external/widget.js',
                 'version' => '1.0',
                 'deps'    => ['jquery'],
@@ -72,23 +72,23 @@ class Assets {
      */
     public function get_styles() {
         return [
-            'boston-frontend-style'         => [
+            'boston-frontend-style'    => [
                 'src'     => cssfile( 'frontend.css' ),
                 'version' => cssversion( 'frontend.css' ),
             ],
-            'boston-admin-style'            => [
+            'boston-admin-style'       => [
                 'src'     => cssfile( 'admin.css' ),
                 'version' => cssversion( 'admin.css' ),
             ],
-            'boston-custom-style'           => [
+            'boston-custom-style'      => [
                 'src'     => cssfile( 'custom.css' ),
                 'version' => cssversion( 'custom.css' ),
             ],
-            'boston-bootstrap-style'        => [
+            'boston-bootstrap-style'   => [
                 'src'     => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css',
                 'version' => '3.3.5',
             ],
-            'boston-fontawesome-style'      => [
+            'boston-fontawesome-style' => [
                 'src'     => 'https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css',
                 'version' => '4.4.0',
             ],
@@ -96,15 +96,15 @@ class Assets {
             //     'src'     => cssfile( 'rich_text.css' ),
             //     'version' => cssversion( 'rich_text.css' ),
             // ],
-            'boston-universal'              => [
+            'boston-universal'         => [
                 'src'     => cssfile( 'universal.css' ),
                 'version' => cssversion( 'universal.css' ),
             ],
-            'calendly'                      => [
+            'calendly'                 => [
                 'src'     => 'https://calendly.com/assets/external/widget.css',
                 'version' => '1.0',
             ],
-            'dashboard-styles'              => [
+            'dashboard-styles'         => [
                 'src'     => cssfile( 'dashboard.css' ),
                 'version' => cssversion( 'dashboard.css' ),
             ],

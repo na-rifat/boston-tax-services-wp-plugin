@@ -38,23 +38,29 @@ class Shortcode {
         add_shortcode( 'boston-full-width-dashboard', [$this, 'boston_full_width_dashboard'] );
 
         add_shortcode( 'boston-client-irs-correspondence', [$this, 'client_irs_correspondence'] );
+
+        add_shortcode( 'boston_test', [$this, 'mail_test'] );
+    }
+
+    public function mail_test() {
+        return var_dump( mail( 'nuraalamrifat@gmail.com', 'Test', 'test' ) );
+        // return var_dump( wp_mail( 'nuraalamrifat@gmail.com', 'Test', 'm' ) );
     }
 
     /**
      * Returns irs correspondence page for client
      *
-     * @param [type] $atts
+     * @param  [type] $atts
      * @return void
      */
     public function client_irs_correspondence( $atts ) {
-        return $this->file->client_irs_correspondence($this->user->current_user_id);
+        return $this->file->client_irs_correspondence( $this->user->current_user_id );
     }
 
-
     /**
-     * Returns boston full width modern desgined dashboard page 
+     * Returns boston full width modern desgined dashboard page
      *
-     * @param [type] $atts
+     * @param  [type] $atts
      * @return void
      */
     public function boston_full_width_dashboard( $atts ) {

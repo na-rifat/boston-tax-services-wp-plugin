@@ -398,6 +398,6 @@ function checkUncheck() {
     let checkBoxes = $(`.wizard-qa-form .wpcf7-checkbox input[type="checkbox"]`);
 
     checkBoxes.on(`click`, function (e) {
-        checkBoxes.not($(this)).prop('checked', false)
+        $(this).parents(`.wpcf7-checkbox`).find(`input[type="checkbox"]`).not($(this)).prop('checked', false)
     })
 }
