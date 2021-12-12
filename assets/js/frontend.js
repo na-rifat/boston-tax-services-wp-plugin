@@ -287,6 +287,7 @@ function docInit($) {
      * wizard update function
      */
     $(document).on(`wpcf7mailsent`, function (event) {
+        alert(123)
 
         let formId = event.detail.contactFormId;
 

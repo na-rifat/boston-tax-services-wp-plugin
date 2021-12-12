@@ -47,48 +47,122 @@
                     </td>
                 </tr>
             </table>
-            <hr/>
+            <hr />
             <div class="expert-information-profile"></div>
-            </div>
+        </div>
     </div>
 </div>
 <script>
-    ;(function ($) {
-        $(`.close-button`).click(function (e) {
-            $(`.assign-tax-expert`).hide(500, function (e) {
-                $(this).remove();
-            });
+;
+(function($) {
+    $(`.close-button`).click(function(e) {
+        $(`.assign-tax-expert`).hide(500, function(e) {
+            $(this).remove();
         });
+    });
 
+    get_expert_profile();
+    $(`#expert_id`).on(`change`, function() {
         get_expert_profile();
-        $(`#expert_id`).on(`change`, function(){
-            get_expert_profile();
-        });
+    });
 
-        function get_expert_profile(){
-            let expert_id = $(`#expert_id`).val();
-            $(`.expert-information-profile`).html(`<div class="loader"></div>`)
+    function get_expert_profile() {
+        let expert_id = $(`#expert_id`).val();
+        $(`.expert-information-profile`).html(`<div class="loader"></div>`)
 
-            $.ajax(
-                {
-                    type: `POST`,
-                    url: boston.ajaxurl,
-                    dataType: `json`,
-                    data: {
-                        action: `get_tax_expert_info`,
-                        expert_id : expert_id
-                    },
-                    success: (res)=>{
-                        console.log(res)
-                        if(res.data.found){
-                            $(`.expert-information-profile`).html(res.data.profile);
-                        }
-                    },
-                    error: ()=>{
-                        alert(`Something went wrong!`);
-                    }
+        $.ajax({
+            type: `POST`,
+            url: boston.ajaxurl,
+            dataType: `json`,
+            data: {
+                action: `get_tax_expert_info`,
+                expert_id: expert_id
+            },
+            success: (res) => {
+                console.log(res)
+                if (res.data.found) {
+                    $(`.expert-information-profile`).html(res.data.profile);
                 }
-            )
-        }    
-    })(jQuery);
+            },
+            error: () => {
+                alert(`Something went wrong!`);
+            }
+        })
+    }
+})(jQuery);
 </script>
+
+
+
+<style>
+.bon-grid-item strong.orange-text {
+    color: #FF9900;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+.bon-grid-item{
+    width: calc(50% - 10px);
+    display: inline-flex;
+    margin: 20px 0 20px 0;
+}
+.bon-grid-item img{
+    margin-right: 40px;
+    filter: grayscale(1);
+}
+.bond-grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+}
+.bon-grid-item div.white-text{
+    color: white;
+}
+</style>
+
+<!-- TEMP -->
+<div class="bon-grid">
+    <div class="bon-grid-item">
+        <div>
+            <img src="https://naturenow.rafalotech.com/wp-content/uploads/2021/11/Icon-awesome-tools.png">
+        </div>
+        <div>
+            <strong class="orange-text">Bonorum et Malorum</strong>
+            <div class="white-text">Bonorum et Malorum</div>
+            <div class="white-text">Bonorum et Malorum</div>
+        </div>
+    </div>
+    <div class="bon-grid-item">
+        <div>
+            <img src="https://naturenow.rafalotech.com/wp-content/uploads/2021/11/Icon-awesome-tools.png">
+        </div>
+        <div>
+            <strong class="orange-text">Bonorum et Malorum</strong>
+            <div class="white-text">Bonorum et Malorum</div>
+            <div class="white-text">Bonorum et Malorum</div>
+        </div>
+    </div>
+    <div class="bon-grid-item">
+        <div>
+            <img src="https://naturenow.rafalotech.com/wp-content/uploads/2021/11/Icon-awesome-tools.png">
+        </div>
+        <div>
+            <strong class="orange-text">Bonorum et Malorum</strong>
+            <div class="white-text">Bonorum et Malorum</div>
+            <div class="white-text">Bonorum et Malorum</div>
+        </div>
+    </div>
+    <div class="bon-grid-item">
+        <div>
+            <img src="https://naturenow.rafalotech.com/wp-content/uploads/2021/11/Icon-awesome-tools.png">
+        </div>
+        <div>
+            <strong class="orange-text">Bonorum et Malorum</strong>
+            <div class="white-text">Bonorum et Malorum</div>
+            <div class="white-text">Bonorum et Malorum</div>
+        </div>
+    </div>
+</div>

@@ -208,3 +208,5 @@ class Shortcode {
         return boston_template( __DIR__, 'agreement_accept' );
     }
 }
+
+

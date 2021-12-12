@@ -87,6 +87,8 @@ class Wizard {
         $current_con = empty( $current_con ) ? 0 : $current_con;
         // $step        = "{$this->step_prefix}{$current_con}";
 
+        // var_dump($current_con);
+
         /*
         #Steps
         1. Q&A (Contact form)
@@ -96,6 +98,9 @@ class Wizard {
          */
         $shortcodes = [
             '[contact-form-7 id="7" title="Q&A form"]',
+            '[agreement-accept]',
+            '[boston-docusign-wizard]',
+            '',
         ];
 
         return do_shortcode( $shortcodes[$current_con] );
@@ -125,7 +130,7 @@ class Wizard {
         $prev_val = get_user_meta( $this->current_user, $this->con_meta_key, true );
         update_user_meta( $this->current_user, $this->con_meta_key, intval( $prev_val ) + 1 );
 
-        echo $this->output_wizard();
+        echo '<div id="wizard-layout">' . $this->output_wizard() . '</div>';
         exit;
     }
 }
